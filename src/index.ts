@@ -53,10 +53,11 @@ wsServer.on("request", function (request) {
 });
 
 function messageHandler(message: IncomingMessage, connection: connection) {
-  console.log('inside message handler');
+  console.log('inside message handler', message);
   if (message.type === SupportedMessage.JoinRoom) {
     const payload = message.payload;
     userManager.addUser(payload.name, payload.userId, payload.roomId, connection);
+    console.log('user saved');
   }
   if (message.type === SupportedMessage.SendMessage) {
     const payload = message.payload;
