@@ -10,16 +10,19 @@ export enum SupportedMessage {
   UpVoteMessage = "UPVOTE_MESSAGE",
 }
 
-export type IncomingMessage = {
-  type: SupportedMessage.JoinRoom,
-  payload: InitMessageType
-} | {
-  type: SupportedMessage.SendMessage,
-  payload: UserMessageType
-} | {
-  type: SupportedMessage.UpVoteMessage,
-  payload: UpVoteMessageType
-}
+export type IncomingMessage =
+  | {
+      type: SupportedMessage.JoinRoom;
+      payload: InitMessageType;
+    }
+  | {
+      type: SupportedMessage.SendMessage;
+      payload: UserMessageType;
+    }
+  | {
+      type: SupportedMessage.UpVoteMessage;
+      payload: UpVoteMessageType;
+    };
 
 export const InitMessage = zod.object({
   name: zod.string(),

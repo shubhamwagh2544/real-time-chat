@@ -1,4 +1,4 @@
-import { Chat, Store, UserId } from "./store/Store";
+import { Chat, Store, UserId } from "./Store";
 
 let globalChatId = 0;
 
@@ -12,6 +12,7 @@ export class InMemoryStore implements Store {
   constructor() {
     this.store = new Map<string, Room>();
   }
+
   initRoom(roomId: string): void {
     this.store.set(roomId, {
       roomId,
@@ -50,7 +51,7 @@ export class InMemoryStore implements Store {
     if (!room) {
       return;
     }
-    // TODO : Make this faster
+    // Todo: Make this faster
     const chat = room.chats.find((chat) => chat.chatId === chatId);
     if (chat) {
       chat.upvotes.push(userId);

@@ -35,4 +35,9 @@ export class UserManager {
       users.filter((user) => user.id !== userId);
     }
   }
+
+  getUser(roomId: string, userId: string): User | null {
+    const user = this.rooms.get(roomId)?.users.find(user => user.id === userId);
+    return user ?? null;
+  }
 }

@@ -3,7 +3,7 @@ import http from "http";
 import { UserManager } from "./UserManager";
 
 import { InMemoryStore } from "./store/InMemoryStore";
-import { IncomingMessage, SupportedMessage } from "./message";
+import { IncomingMessage, SupportedMessage } from "./messages/IncomingMessages";
 
 const server = http.createServer(function (request: any, response: any) {
   console.log(new Date() + " Received request for " + request.url);
@@ -40,18 +40,33 @@ wsServer.on("request", function (request) {
   const connection = request.accept("echo-protocol", request.origin);
   console.log(new Date() + " Connection accepted.");
   connection.on("message", function (message) {
-    // Todo add rate limitting logic here
+    // Todo: Add rate limiting logic here
     if (message.type === "utf8") {
       try {
         messageHandler(JSON.parse(message.utf8Data), connection);
-      } catch (e) {}
+      } catch (error) {
+        console.log(error);
+      }
     }
   });
 });
 
 function messageHandler(message: IncomingMessage, connection: connection) {
-  if (message.type == SupportedMessage.JoinRoom) {
-    const payload= message.payload;
+  if (message.type === SupportedMessage.JoinRoom) {
+    const payload = message.payload;
     userManager.addUser(payload.name, payload.userId, payload.roomId, connection);
+  }
+  if (message.type === SupportedMessage.SendMessage) {
+    const payload = message.payload;
+    const user = userManager.getUser(payload.roomId, payload.userId);
+    if (!user) {
+      console.log('User not Found!')
+      return;
+    }
+    store.addChat(payload.roomId, payload.userId, user.name, payload.message);
+    // Todo: Add broadcasting logic here
+  }
+  if (message.type === SupportedMessage.UpVoteMessage) {
+
   }
 }
