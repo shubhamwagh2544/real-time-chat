@@ -1,11 +1,7 @@
 import { connection, server as WebSocketServer } from "websocket";
 import http from "http";
 import { UserManager } from "./UserManager";
-import {
-  OutgoingMessage,
-  SupportedMessage as OutgoingSupportedMessage,
-  MessagePayload,
-} from "./messages/OutgoingMessages";
+import { OutgoingMessage, SupportedMessage as OutgoingSupportedMessage } from "./messages/OutgoingMessages";
 import { InMemoryStore } from "./store/InMemoryStore";
 import { IncomingMessage, SupportedMessage } from "./messages/IncomingMessages";
 
@@ -24,7 +20,7 @@ server.listen(8080, function () {
 
 const wsServer = new WebSocketServer({
   httpServer: server,
-  autoAcceptConnections: true,
+  autoAcceptConnections: false,
 });
 
 function originIsAllowed(origin: string) {
@@ -41,21 +37,23 @@ wsServer.on("request", function (request) {
     return;
   }
 
-  const connection = request.accept("echo-protocol", request.origin);
+  const connection = request.accept();
   console.log(new Date() + " Connection accepted.");
   connection.on("message", function (message) {
+    console.log('inside ws message');
     // Todo: Add rate limiting logic here
     if (message.type === "utf8") {
       try {
         messageHandler(JSON.parse(message.utf8Data), connection);
       } catch (error) {
-        console.log(error);
+        console.error('Error parsing message: ', error);
       }
     }
   });
 });
 
 function messageHandler(message: IncomingMessage, connection: connection) {
+  console.log('inside message handler');
   if (message.type === SupportedMessage.JoinRoom) {
     const payload = message.payload;
     userManager.addUser(payload.name, payload.userId, payload.roomId, connection);
@@ -69,7 +67,7 @@ function messageHandler(message: IncomingMessage, connection: connection) {
     }
     let chat = store.addChat(payload.roomId, payload.userId, user.name, payload.message);
     if (!chat) {
-      console.log('Chat not Found');
+      console.log("Chat not Found");
       return;
     }
 
@@ -94,7 +92,7 @@ function messageHandler(message: IncomingMessage, connection: connection) {
       payload: {
         chatId: payload.chatId,
         roomId: payload.roomId,
-        upvotes: chat?.upvotes.length
+        upvotes: chat?.upvotes.length,
       },
     };
     userManager.broadcast(payload.roomId, payload.userId, outgoingPayload);
