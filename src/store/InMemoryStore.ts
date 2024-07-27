@@ -32,21 +32,25 @@ export class InMemoryStore implements Store {
       .slice(-1 * limit);
   }
 
-  addChat(roomId: string, userId: UserId, name: string, message: string): void {
+  addChat(roomId: string, userId: UserId, name: string, message: string) {
     const room = this.store.get(roomId);
     if (!room) {
+      console.log("Room not Found");
       return;
+    } else {
+      let chat: Chat = {
+        chatId: (globalChatId++).toString(),
+        userId,
+        name,
+        message,
+        upvotes: [],
+      };
+      room.chats.push(chat);
+      return chat;
     }
-    room.chats.push({
-      chatId: (globalChatId++).toString(),
-      userId,
-      name,
-      message,
-      upvotes: [],
-    });
   }
 
-  upvote(roomId: string, chatId: string, userId: UserId): void {
+  upvote(roomId: string, chatId: string, userId: UserId){
     const room = this.store.get(roomId);
     if (!room) {
       return;
@@ -56,5 +60,6 @@ export class InMemoryStore implements Store {
     if (chat) {
       chat.upvotes.push(userId);
     }
+    return chat;
   }
 }
