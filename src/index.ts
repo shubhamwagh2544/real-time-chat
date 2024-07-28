@@ -40,24 +40,24 @@ wsServer.on("request", function (request) {
   const connection = request.accept();
   console.log(new Date() + " Connection accepted.");
   connection.on("message", function (message) {
-    console.log('inside ws message');
+    console.log("inside ws message");
     // Todo: Add rate limiting logic here
     if (message.type === "utf8") {
       try {
         messageHandler(JSON.parse(message.utf8Data), connection);
       } catch (error) {
-        console.error('Error parsing message: ', error);
+        console.error("Error parsing message: ", error);
       }
     }
   });
 });
 
 function messageHandler(message: IncomingMessage, connection: connection) {
-  console.log('inside message handler', message);
+  console.log("inside message handler", message);
   if (message.type === SupportedMessage.JoinRoom) {
     const payload = message.payload;
     userManager.addUser(payload.name, payload.userId, payload.roomId, connection);
-    console.log('user saved');
+    console.log("user saved");
   }
   if (message.type === SupportedMessage.SendMessage) {
     const payload = message.payload;
@@ -83,6 +83,7 @@ function messageHandler(message: IncomingMessage, connection: connection) {
       },
     };
     userManager.broadcast(payload.roomId, payload.userId, outgoingPayload);
+    console.log("message received");
   }
 
   if (message.type === SupportedMessage.UpVoteMessage) {

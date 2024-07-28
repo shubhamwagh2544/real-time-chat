@@ -1,41 +1,61 @@
 <html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>RealTimeChat</title>
-</head>
-<body>
-<script>
-  const ws = new WebSocket("ws://localhost:8080");
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>RealTimeChat</title>
+  </head>
+  <body>
+    <script>
+      const ws = new WebSocket("ws://localhost:8080");
 
-  ws.onopen = function() {
-    ws.send(JSON.stringify({
-      type: "JOIN_ROOM",
-      payload: {
-        name: "shubham",
-        userId: "1",
-        roomId: "1"
-      }
-    }));
-  }
+      ws.onopen = function () {
+        ws.send(
+          JSON.stringify({
+            type: "JOIN_ROOM",
+            payload: {
+              name: "shubham",
+              userId: "1",
+              roomId: "1",
+            },
+          })
+        );
+      };
 
-  function sendChat() {
-    ws.send(JSON.stringify({
-      type: "SEND_MESSAGE",
-      payload: {
-        userId: "1",
-        roomId: "1",
-        message: "Sending default message"
+      ws.onmessage = function (event) {
+        try {
+          const { type, payload } = JSON.parse(event.data); // parse json
+          if (type === "ADD_CHAT") {
+            console.log("first");
+            const textNode = document.createElement("p");
+            textNode.innerHTML = payload.message + `(${payload.upvotes})`;
+            document.getElementById("messages").appendChild(textNode);
+            console.log("message received");
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      };
+
+      function sendChat() {
+        ws.send(
+          JSON.stringify({
+            type: "SEND_MESSAGE",
+            payload: {
+              userId: "1",
+              roomId: "1",
+              message: document.getElementById("input-text").value,
+            },
+          })
+        );
       }
-    }));
-  }
-</script>
-Hello World
-<input type="text" placeholder="enter message to send"/>
-<button onclick={sendChat()}>
-  Send Chat
-</button>
-</body>
+    </script>
+    Hello World
+    <input id="input-text" type="text" placeholder="enter message to send" />
+    <button onclick="{sendChat()}">Send Chat</button>
+    <div id="messages"></div>
+  </body>
 </html>

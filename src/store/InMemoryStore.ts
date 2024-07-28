@@ -53,7 +53,7 @@ export class InMemoryStore implements Store {
     }
   }
 
-  upvote(roomId: string, chatId: string, userId: UserId){
+  upvote(roomId: string, chatId: string, userId: UserId) {
     const room = this.store.get(roomId);
     if (!room) {
       return;
