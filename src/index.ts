@@ -89,6 +89,7 @@ function messageHandler(message: IncomingMessage, connection: connection) {
   if (message.type === SupportedMessage.UpVoteMessage) {
     const payload = message.payload;
     const chat = store.upvote(payload.roomId, payload.chatId, payload.userId);
+    console.log('chat => : ', chat)
     const outgoingPayload: OutgoingMessage = {
       type: OutgoingSupportedMessage.UpdateChat,
       payload: {
